@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>FastAPI CI/CD Demo</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+  </head>
+
+  <body
+    class="min-h-screen bg-gradient-to-b from-white via-slate-50 to-slate-100 text-slate-800"
+  >
+    <div class="min-h-screen flex items-center justify-center p-6">
+      <div class="w-full max-w-3xl">
+        <!-- Header -->
+        <header class="mb-6">
+          <div class="flex items-center justify-between">
+            <div>
+              <h1 class="text-3xl font-extrabold tracking-tight">
+                FastAPI CI/CD Demo
+              </h1>
+              <p class="mt-1 text-sm text-slate-500">
+                Lightweight todo service to validate pipelines and runtime.
+              </p>
+            </div>
+            <div class="text-right">
+              <span
+                class="inline-flex items-center gap-2 rounded-full bg-slate-50 px-3 py-1 text-sm font-medium text-slate-600 shadow-sm"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  class="h-4 w-4"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  aria-hidden="true"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M3 7h18M3 12h18M3 17h18"
+                  />
+                </svg>
+                CI Friendly
+              </span>
+            </div>
+          </div>
+        </header>
+
+        <!-- Card -->
+        <main
+          class="bg-white rounded-2xl shadow-md ring-1 ring-slate-100 overflow-hidden"
+        >
+          <div class="p-6">
+            <!-- Form -->
+            <form
+              id="todo-form"
+              class="flex gap-3 items-center"
+              aria-label="Add todo"
+            >
+              <label for="title" class="sr-only">New todo</label>
+              <input
+                id="title"
+                name="title"
+                type="text"
+                autocomplete="off"
+                placeholder="What needs to be done?"
+                class="flex-1 block w-full rounded-lg border border-slate-200 bg-slate-50 px-4 py-3 text-sm placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-sky-400 focus:border-transparent transition"
+              />
+              <button
+                type="submit"
+                class="inline-flex items-center gap-2 rounded-lg bg-sky-600 px-4 py-2 text-sm font-semibold text-white shadow hover:bg-sky-700 focus:outline-none focus:ring-2 focus:ring-sky-300"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  class="h-4 w-4 -ml-1"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  aria-hidden="true"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M12 4v16m8-8H4"
+                  />
+                </svg>
+                Add
+              </button>
+            </form>
+
+            <!-- Controls -->
+            <div
+              class="mt-4 flex items-center justify-between text-sm text-slate-500"
+            >
+              <span id="count" class="hidden"></span>
+              <div class="flex items-center gap-3">
+                <button
+                  id="refresh"
+                  class="text-slate-500 hover:text-slate-700 focus:outline-none"
+                >
+                  Refresh
+                </button>
+                <span class="hidden sm:inline">•</span>
+                <button
+                  id="clear-completed"
+                  class="text-red-500 hover:text-red-600 focus:outline-none hidden"
+                >
+                  Clear completed
+                </button>
+              </div>
+            </div>
+
+            <!-- List -->
+            <section class="mt-6">
+              <ul id="list" class="space-y-3"></ul>
+
+              <!-- Empty state -->
+              <div
+                id="empty-state"
+                class="mt-6 rounded-lg border border-dashed border-slate-200 bg-slate-50 p-6 text-center text-slate-500"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  class="mx-auto h-8 w-8 text-slate-400"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  aria-hidden="true"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="1.5"
+                    d="M9 13l3 3L22 4"
+                  />
+                </svg>
+                <p class="mt-3">No todos yet — add your first task above.</p>
+                <p class="mt-1 text-xs">
+                  This demo is connected to
+                  <code class="rounded bg-slate-100 px-1 py-0.5"
+                    >/api/todos</code
+                  >.
+                </p>
+              </div>
+            </section>
+          </div>
+
+          <!-- Footer -->
+          <footer
+            class="border-t border-slate-100 bg-slate-50 px-6 py-3 text-xs text-slate-500"
+          >
+            <div class="flex items-center justify-between">
+              <span>Local demo • FastAPI + PostgreSQL</span>
+              <span>Built for CI validation</span>
+            </div>
+          </footer>
+        </main>
+      </div>
+    </div>
+
+    <script>
+      // Small UX helpers so app.js can remain unchanged.
+      // Show/hide empty state depending on content length.
+      (function () {
+        const listNode = () => document.getElementById("list");
+        const empty = document.getElementById("empty-state");
+        function toggleEmpty() {
+          const hasItems = listNode().children.length > 0;
+          empty.style.display = hasItems ? "none" : "block";
+        }
+        // monitor list changes and toggle
+        const observer = new MutationObserver(toggleEmpty);
+        observer.observe(listNode(), { childList: true, subtree: false });
+        // initial
+        toggleEmpty();
+
+        // wire refresh button to re-fetch if app.js exposes fetchTodos globally
+        const refresh = document.getElementById("refresh");
+        refresh.addEventListener("click", () => {
+          if (typeof fetchTodos === "function") fetchTodos();
+        });
+      })();
+    </script>
+
+    <script src="/static/app.js"></script>
+  </body>
+</html>
