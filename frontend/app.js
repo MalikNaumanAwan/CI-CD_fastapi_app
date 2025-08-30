@@ -2,7 +2,7 @@
 const API = "https://ci-cdfastapiapp-production.up.railway.app";
 // Fetch and render todos
 async function fetchTodos() {
-  const res = await fetch(`${API}/app/todos`);
+  const res = await fetch(`${API}/api/todos`);
   const data = await res.json();
   const list = document.getElementById("list");
   list.innerHTML = "";
