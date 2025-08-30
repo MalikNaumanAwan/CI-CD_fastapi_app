@@ -1,5 +1,7 @@
-const API = "http://localhost:8090/api/todos";
-
+//const API = "http://localhost:8090/api/todos";
+const response = await fetch(
+  "https://ci-cdfastapiapp-production.up.railway.app/api/todos/"
+);
 // Fetch and render todos
 async function fetchTodos() {
   const res = await fetch(`${API}/`);
