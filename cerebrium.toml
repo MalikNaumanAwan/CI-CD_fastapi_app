@@ -1,0 +1,34 @@
+[cerebrium.deployment]
+name = "fastapi-ci-demo"
+python_version = "3.11"
+docker_base_image_url = "debian:bookworm-slim"
+disable_auth = true
+include = [
+    'app/**',
+    'frontend/**',
+    'main.py',
+    'cerebrium.toml',
+    'requirements.txt'
+]
+
+exclude = ['.*']
+
+[cerebrium.hardware]
+cpu = 2.0
+memory = 2.0
+compute = "CPU"
+provider = "aws"
+region = "us-east-1"
+
+[cerebrium.scaling]
+min_replicas = 0
+max_replicas = 2
+cooldown = 30
+replica_concurrency = 1
+scaling_metric = "concurrency_utilization"
+
+[cerebrium.entrypoint]
+command = "uvicorn main:app --host 0.0.0.0 --port 8090"
+
+[cerebrium.env]
+DATABASE_URL = "postgresql://neondb_owner:npg_z3pGAn5WPvKw@ep-winter-lab-ady4yz5q-pooler.c-2.us-east-1.aws.neon.tech/demo_ci?sslmode=require&channel_binding=require"

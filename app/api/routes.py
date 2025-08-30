@@ -9,6 +9,13 @@ from app.crud import todo as crud
 router = APIRouter(prefix="/todos", tags=["todos"])
 
 
+@router.get(
+    "/https://api.aws.us-east-1.cerebrium.ai/v4/p-d1acc5d1/fastapi-ci-demo/app/api/status/"
+)
+async def root():
+    return {"status": "ok", "message": "FastAPI on Cerebrium is running!"}
+
+
 @router.get("/", response_model=list[TodoRead])
 async def get_todos(db: AsyncSession = Depends(get_db)):
     return await crud.list_todos(db)
