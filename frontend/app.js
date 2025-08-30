@@ -2,7 +2,7 @@
 const API = "https://ci-cdfastapiapp-production.up.railway.app";
 // Fetch and render todos
 async function fetchTodos() {
-  const res = await fetch(`${API}/api/todos`);
+  const res = await fetch(`${API}/api/todos/`);
   const data = await res.json();
   const list = document.getElementById("list");
   list.innerHTML = "";
@@ -38,7 +38,7 @@ function attachEventListeners() {
     btn.addEventListener("click", async (e) => {
       const id = e.target.dataset.id;
       // match backend route
-      await fetch(`${API}/${id}/done`, {
+      await fetch(`${API}/api/todos/${id}/done`, {
         method: "POST",
       });
       fetchTodos();
@@ -48,7 +48,7 @@ function attachEventListeners() {
   document.querySelectorAll(".del").forEach((btn) => {
     btn.addEventListener("click", async (e) => {
       const id = e.target.dataset.id;
-      await fetch(`${API}/${id}`, { method: "DELETE" });
+      await fetch(`${API}/api/todos/${id}`, { method: "DELETE" });
       fetchTodos();
     });
   });
@@ -61,7 +61,7 @@ document.getElementById("todo-form").addEventListener("submit", async (e) => {
   const title = input.value.trim();
   if (!title) return;
 
-  await fetch(`${API}/`, {
+  await fetch(`${API}/api/todos/`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ title }),
